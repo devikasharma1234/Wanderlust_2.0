@@ -8,6 +8,8 @@ const ListingController = require("../controllers/listings.js");
 const multer  = require('multer');
 const {storage} = require("../cloudConfig.js");
 const upload = multer({storage});
+const { cloudinary, uploads } = require("../cloudConfig");
+
 
 // making restful api's for listings
 
@@ -47,10 +49,25 @@ router.put("/:id",
     validateListing,
     wrapAsync(ListingController.updateListing));
 
+router.post("/upload", upload.single("image"), async (req, res) => {
+  try {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "wanderlust_DEV",
+      allowed_formats: ["png", "jpg", "jpeg"],
+    });
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // DELETE Route
 router.delete("/:id", 
     isLoggedIn, 
     isOwner,
     wrapAsync(ListingController.deleteListing));
+
+
 
 module.exports = router;
