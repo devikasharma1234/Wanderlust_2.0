@@ -1,3 +1,4 @@
+
 const sampleListings = [
   {
     title: "Cozy Beachfront Cottage",
@@ -346,7 +347,8 @@ const sampleListings = [
     price: 1800,
     location: "Costa Rica",
     country: "Costa Rica",
-  },
-];
+   },
+ ];
 
-module.exports = { data: sampleListings };
+ module.exports = { data: sampleListings };
+

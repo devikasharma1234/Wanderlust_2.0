@@ -127,3 +127,17 @@ body {
     height: 400px;
     width: 80vh;
 }
+
+
+/* listing-details */
+.details{
+    display: flex;
+}
+
+.icon i{
+    font-size: 1.3rem;
+}
+
+.details .text-content{
+    margin-left: 0.6rem;
+}

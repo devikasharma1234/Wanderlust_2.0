@@ -16,6 +16,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const paymentController = require("./controllers/paymentController.js");
 
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
@@ -35,6 +36,7 @@ async function main(){  // creating database
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.json());
 app.use(express.urlencoded({extended: true}));  // to parse the data coming inside req
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);   // using ejs mate for making templates
@@ -66,7 +68,7 @@ const sessionOptions = {
 };
 
 // const sessionOptions = {
-//   secret: process.env.SESSION_SECRET || "mysecretcode",
+//   secret: process.env.SESSION_SECRET || 
 //   resave: false,
 //   saveUninitialized: true,
 //   store: MongoStore.create({
@@ -87,8 +89,6 @@ const sessionOptions = {
 // app.get("/", (req, res) =>{
 //     res.send("Hi, i am root");
 // });
-
-
 
 // using sessions and flash
 app.use(session(sessionOptions));
@@ -124,6 +124,9 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
+app.post("/create-order", paymentController.createOrder);
+app.get("/payment-success", paymentController.renderSuccess);
+
 
 // server side validation (error handling)
 // Catch-all errors for unmatched routes
@@ -138,5 +141,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(8080, () =>{
-    console.log("server is listeing to port 8080");
+    console.log("server is listening to port 8080");
 });
