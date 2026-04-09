@@ -25,7 +25,7 @@
             <p class="card-text"><%= listing.country %></p>
         </div>
 
-        <div class="booking">
+        <!-- <div class="booking">
         <br>
         <button id="rzp-button1" class="btn btn-success">Book Now</button>
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -54,7 +54,7 @@
             "description": "<%= listing.title %>",
             "order_id": order.id, // THE REAL ID FROM BACKEND
             "handler": function (response){
-                window.location.href = "/payment-success";
+                window.location.href = `/success?order_id=${response.razorpay_order_id}&payment_id=${response.razorpay_payment_id}`;
             },
             "theme": { "color": "#fe424d" }
         };
@@ -62,7 +62,28 @@
         rzp1.open();
     }
 </script> 
-        </div>
+        </div> -->
+
+<div class="booking">
+    <br>
+    <button id="rzp-button1" class="btn btn-success">Book Now</button>
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/js/payment.js"></script>
+    
+    <script>
+        document.getElementById('rzp-button1').onclick = function(e) {
+            e.preventDefault();
+            // Pass the API Key from .env via EJS to the function
+            initializeRazorpay(
+                "<%= listing._id %>", 
+                "<%= listing.price %>", 
+                "<%= listing.title %>",
+                "<%= razorpayKey %>" 
+            );
+        };
+    </script>
+</div>
         
         <hr>
         <br>

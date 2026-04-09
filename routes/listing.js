@@ -10,7 +10,6 @@ const {storage} = require("../cloudConfig.js");
 const upload = multer({storage});
 const { cloudinary, uploads } = require("../cloudConfig");
 
-
 // making restful api's for listings
 
 // INDEX Route
@@ -25,7 +24,7 @@ router    // same routes
     validateListing,
     wrapAsync(ListingController.createListing)
     );
-
+    
 
 // NEW Route   
 router.get("/new", isLoggedIn, ListingController.renderNewForm);

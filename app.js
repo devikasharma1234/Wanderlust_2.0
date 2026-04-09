@@ -103,10 +103,16 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
-app.use((req, res, next) =>{
+// Middleware to set local variables for EJS
+app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;
+    
+    // This line tells EJS that 'currUser' is whoever is logged in (req.user)
+    // If no one is logged in, it will be 'undefined' or 'null', which is fine!
+    res.locals.currUser = req.user; 
+    res.locals.razorpayKey = process.env.RZP_API_KEY;
+    
     next();
 });
 
@@ -125,7 +131,7 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.post("/create-order", paymentController.createOrder);
-app.get("/payment-success", paymentController.renderSuccess);
+app.get("/success", paymentController.renderSuccess);
 
 
 // server side validation (error handling)
