@@ -87,15 +87,27 @@ const razorpay = new Razorpay({
     key_secret: RZP_API_SECRET,
 });
 
+const path = require("path");
+const os = require("os");
+const ordersFilePath = path.join(os.tmpdir(), "orders.json");
+
 const readData = () => {
-    if (fs.existsSync('orders.json')) {
-        return JSON.parse(fs.readFileSync('orders.json'));
+    try {
+        if (fs.existsSync(ordersFilePath)) {
+            return JSON.parse(fs.readFileSync(ordersFilePath));
+        }
+    } catch (err) {
+        console.error("Error reading orders.json:", err);
     }
     return [];
 };
 
 const writeData = (data) => {
-    fs.writeFileSync('orders.json', JSON.stringify(data, null, 2));
+    try {
+        fs.writeFileSync(ordersFilePath, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.error("Error writing orders.json:", err);
+    }
 };
 
 // Handle Order Creation

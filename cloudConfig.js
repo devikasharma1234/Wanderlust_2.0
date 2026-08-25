@@ -16,7 +16,9 @@ const storage = new CloudinaryStorage({
     },
 });
 
-const uploads = multer({ dest: "uploads/" });
+const os = require("os");
+
+const uploads = multer({ dest: os.tmpdir() });
 
 module.exports = {
     cloudinary,
