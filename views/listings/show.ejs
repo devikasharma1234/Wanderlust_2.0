@@ -1,196 +1,151 @@
 <% layout("/layouts/boilerplate") %>
 
-
-<script>
-    const mapToken = "<%= process.env.MAP_TOKEN %>";   // will use this map token in map.js as cannot directly access MAP_TOKEN from .env
-    const listing = JSON.parse('<%- JSON.stringify(listing) %>');
-</script>
-
-<div class="row mt-3">
-    <div class="col-8 offset-3">
-        <h3><%= listing.title %></h3>
-    </div>
-    <div class="card col-7 offset-3 show-card listing-card">
-        <img 
-        src="<%= listing.image.url %>" 
-        class="card-img-top show-img" 
-        alt="listing_image">
-        <div class="card-body">
-            <% if(listing.owner) { %>
-            <p class="card-text">Owned by <i><%= listing.owner.username %></i></p>
-            <% } %>
-            <p class="card-text"><%= listing.description %></p>  
-            <p class="card-text">&#8377; <%= listing.price.toLocaleString("en-IN") %></p> 
-            <p class="card-text"><%= listing.location %></p> 
-            <p class="card-text"><%= listing.country %></p>
-        </div>
-
-        <!-- <div class="booking">
-        <br>
-        <button id="rzp-button1" class="btn btn-success">Book Now</button>
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <script>
-        document.getElementById('rzp-button1').onclick = async function(e) {
-        e.preventDefault();
-
-        //  Call your backend to create a real Order
-        const response = await fetch('/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount: "<%= listing.price %>", // Dynamic price from EJS
-                currency: "INR",
-                receipt: "receipt_<%= listing._id %>"
-            })
-        });
-        const order = await response.json();
-
-        //  Open Razorpay with the real Order ID
-        var options = {
-            "key": "rzp_test_SPxDc9ZRfQJkfO", // Use your actual Key ID here
-            "amount": 200,
-            "currency": "INR",
-            "name": "Wanderlust",
-            "description": "<%= listing.title %>",
-            "order_id": order.id, // THE REAL ID FROM BACKEND
-            "handler": function (response){
-                window.location.href = `/success?order_id=${response.razorpay_order_id}&payment_id=${response.razorpay_payment_id}`;
-            },
-            "theme": { "color": "#fe424d" }
-        };
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
-    }
-</script> 
-        </div> -->
-
-<div class="booking">
-    <br>
-    <button id="rzp-button1" class="btn btn-success">Book Now</button>
-    
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="/js/payment.js"></script>
-    
     <script>
-        document.getElementById('rzp-button1').onclick = function(e) {
-            e.preventDefault();
-            // Pass the API Key from .env via EJS to the function
-            initializeRazorpay(
-                "<%= listing._id %>", 
-                "<%= listing.price %>", 
-                "<%= listing.title %>",
-                "<%= razorpayKey %>" 
-            );
-        };
+        const mapToken = "<%= process.env.MAP_TOKEN %>";   // will use this map token in map.js as cannot directly access MAP_TOKEN from .env
+        const listing = JSON.parse('<%- JSON.stringify(listing) %>');
     </script>
-</div>
-        
-        <hr>
-        <br>
 
-        <div class="details">
-            <span class="icon"><i class="fa-regular fa-star"></i></span>
-            <div class="text-content">
-                <div class="title"><b>Guest Favouite</b></div>
-                <div class="subtitle">One of the most loved place on Wanderlust</div>
-            </div>
-
-            <span class="icon"><i class="fa-solid fa-calculator"></i></span>
-            <div class="text-content">
-                <div class="title"><b>Self Check in</b></div>
-                <div class="subtitle">Check yourself in wit the lockbox</div>
-            </div>
-
-            <span class="icon"><i class="fa-regular fa-calendar"></i></span>
-            <div class="text-content">
-                <div class="title"><b>Free Cancellation</b></div>
-                <div class="subtitle">Cancel between 48 hours for partial refund</div>
-            </div>
+    <div class="row mt-3 justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <h3><%= listing.title %></h3>
         </div>
-        <br>
-        <hr>
-    
 
-    </div>
-
-    <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)){ %> 
-    <div class="btns mb-5">
-        <a href="/listings/<%= listing._id %>/edit" 
-            class="btn btn-dark offset-3 edit-btn">Edit</a>
-    
-        <form method="POST" action="/listings/<%= listing._id%>?_method=DELETE">
-            <button class="btn btn-dark offset-5">Delete</button>
-        </form>
-       
-    </div>
-    <% } %>
-  
-
-    <div class="col-7 offset-3 mb-3">
-        <% if(currUser){ %>
-        <h4><i class="fa-solid fa-comment"></i>Leave a Review</h4>
-        <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
+        <div class="card col-12 col-md-10 col-lg-8 show-card listing-card">
+            <img 
+            src="<%= listing.image.url %>" 
+            class="card-img-top show-img mb-3" 
+            alt="listing_image">
             
-            <div class="mb-3 mt-3">
-                <label for="rating" class="form-label">Rating</label>
-            <fieldset class="starability-basic">
-
-                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                <label for="first-rate1" title="Terrible">1 star</label>
-                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                <label for="first-rate2" title="Not good">2 stars</label>
-                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                <label for="first-rate3" title="Average">3 stars</label>
-                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                <label for="first-rate4" title="Very good">4 stars</label>
-                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                <label for="first-rate5" title="Amazing">5 stars</label>
-            </fieldset>
+            <div class="card-body">
+                <% if(listing.owner) { %>
+                <p class="card-text">Owned by <i><%= listing.owner.username %></i></p>
+                <% } %>
+                <p class="card-text"><%= listing.description %></p>  
+                <p class="card-text">&#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %></p> 
+                <p class="card-text"><%= listing.location %></p> 
+                <p class="card-text"><%= listing.country %></p>
             </div>
 
-            <div>
-                <label for="comment" class="form-label">Comments</label>
-                <textarea 
-                rows="10" 
-                cols="20" 
-                id="comment" 
-                name="review[comment]" 
-                class="form-control mb-3"
-                required></textarea>
-                <div class="invalid-feedback">Please add some comments for review</div>
+            <div class="booking my-3">
+                <button id="rzp-button1" class="btn btn-success px-4 py-2">Book Now</button>
+                
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                <script src="/js/payment.js"></script>
+                
+                <script>
+                    document.getElementById('rzp-button1').onclick = function(e) {
+                        e.preventDefault();
+                        initializeRazorpay(
+                            "<%= listing._id %>", 
+                            "<%= listing.price %>", 
+                            "<%= listing.title %>",
+                            "<%= razorpayKey %>" 
+                        );
+                    };
+                </script>
             </div>
-            <button class="btn btn-outline-dark">Submit Review</button>
-        </form>
+            
+            <hr>
+
+            <div class="details my-3 flex-column flex-sm-row gap-3">
+                <div class="d-flex align-items-center mb-2 mb-sm-0">
+                    <span class="icon me-2"><i class="fa-regular fa-star"></i></span>
+                    <div class="text-content">
+                        <div class="title"><b>Guest Favourite</b></div>
+                        <div class="subtitle text-muted">One of the most loved places on Wanderlust</div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span class="icon me-2"><i class="fa-solid fa-calculator"></i></span>
+                    <div class="text-content">
+                        <div class="title"><b>Self Check-in</b></div>
+                        <div class="subtitle text-muted">Check yourself in with the lockbox</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+        </div>
+
+        <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)){ %> 
+        <div class="btns mb-4 col-12 col-md-10 col-lg-8 d-flex gap-3">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn px-4">Edit</a>
+        
+            <form method="POST" action="/listings/<%= listing._id%>?_method=DELETE">
+                <button class="btn btn-danger px-4">Delete</button>
+            </form>
+        </div>
         <% } %>
 
-        <hr/>
-
-        <% if(listing.reviews.length >0){ %>
-        <div class="row">
-            <p><b>All Reviews</b></p>
-            <% for(let review of listing.reviews) { %>
-                <div class="card col-5 ms-3 mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">@<%= review.author.username %></h5>
-                        <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
-                        <p class="card-text"><%= review.comment %></p>
-                        
-                    </div>
-                    <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                        <button class="btn btn-sm btn-dark">Delete</button>
-                    </form>
+        <div class="col-12 col-md-10 col-lg-8 mb-4">
+            <% if(currUser){ %>
+            <h4><i class="fa-solid fa-comment me-2"></i>Leave a Review</h4>
+            <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
+                
+                <div class="mb-3 mt-3">
+                    <label for="rating" class="form-label">Rating</label>
+                    <fieldset class="starability-basic">
+                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                        <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                        <label for="first-rate1" title="Terrible">1 star</label>
+                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
                 </div>
+
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comments</label>
+                    <textarea 
+                    rows="5" 
+                    id="comment" 
+                    name="review[comment]" 
+                    class="form-control"
+                    placeholder="Share your thoughts about your stay..."
+                    required></textarea>
+                    <div class="invalid-feedback">Please add comments for your review</div>
+                </div>
+                <button class="btn btn-outline-dark">Submit Review</button>
+            </form>
+            <hr class="my-4"/>
+            <% } %>
+
+            <% if(listing.reviews && listing.reviews.length > 0){ %>
+            <div class="reviews-section">
+                <h5 class="mb-3"><b>All Reviews</b></h5>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    <% for(let review of listing.reviews) { %>
+                        <div class="col">
+                            <div class="card h-100 p-3 shadow-sm border-0 bg-light">
+                                <div class="card-body p-0">
+                                    <h6 class="card-title fw-bold">@<%= review.author ? review.author.username : "Anonymous" %></h6>
+                                    <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
+                                    <p class="card-text text-secondary"><%= review.comment %></p>
+                                </div>
+                                <% if(currUser && review.author && currUser._id.equals(review.author._id)) { %>
+                                <form class="mt-2" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                <hr class="my-4"/>
+            </div>
             <% } %>
         </div>
-        <% } %>
+
+        <div class="col-12 col-md-10 col-lg-8 mb-5">
+            <h4 class="mb-3">Where you'll be</h4>
+            <div id="map"></div>
+        </div>
     </div>
 
-    <div class="col-6 offset-3 mb-3">
-        <h3>Where you'll be</h3>
-        <div id="map"></div>
-    </div>
-
-</div>
-
-<script src="/js/map.js"></script>
+    <script src="/js/map.js"></script>
